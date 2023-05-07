@@ -1,0 +1,5 @@
+build
+downscaled
+.idea
+*.spec
+*.pyc
