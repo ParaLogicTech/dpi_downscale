@@ -7,6 +7,9 @@ import sys
 Image.MAX_IMAGE_PIXELS = 933120000
 
 DOWNSCALED_DIRECTORY = "downscaled"
+PROGRAM_DIRECTORY = os.path.dirname(os.path.realpath(sys.argv[0]))
+DOWNSCALED_PATH = os.path.join(PROGRAM_DIRECTORY, DOWNSCALED_DIRECTORY)
+
 DOWNSCALED_DPI = 10
 JPEG_QUALITY = 70
 
@@ -76,17 +79,14 @@ def handle_completed(completed, count):
 def downscale_file(file):
 	pwd = os.getcwd()
 
-	filename, extension = os.path.splitext(file)
-
-	downscale_directory = os.path.join(pwd, DOWNSCALED_DIRECTORY)
-	downscaled_file = os.path.join(downscale_directory, f"{filename}.jpg")
+	filename = os.path.splitext(os.path.basename(file))[0]
+	downscaled_file = os.path.join(DOWNSCALED_PATH, f"{filename}.jpg")
 
 	# if os.path.isfile(downscaled_file):
 	# 	return
 
 	try:
 		im = Image.open(os.path.join(pwd, file))
-		print(f"Downscaling {file}")
 
 		if im.mode == "RGBA":
 			im = im.convert("RGB")
@@ -99,7 +99,6 @@ def downscale_file(file):
 		create_downscaled_directory()
 		im.save(downscaled_file, "JPEG", quality=JPEG_QUALITY, dpi=(DOWNSCALED_DPI, DOWNSCALED_DPI))
 	except Exception as e:
-		print(e)
 		error_label['text'] = f"({file}) {e}"
 		root.update_idletasks()
 		return False
@@ -122,8 +121,8 @@ def get_files():
 
 
 def create_downscaled_directory():
-	if not os.path.exists("downscaled"):
-		os.makedirs("downscaled")
+	if not os.path.exists(DOWNSCALED_PATH):
+		os.makedirs(DOWNSCALED_PATH)
 		return True
 
 
