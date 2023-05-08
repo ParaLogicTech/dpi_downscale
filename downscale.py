@@ -6,15 +6,16 @@ import sys
 
 Image.MAX_IMAGE_PIXELS = 933120000
 
-DOWNSCALED_DIRECTORY = "downscaled"
+PWD = os.getcwd()
 PROGRAM_DIRECTORY = os.path.dirname(os.path.realpath(sys.argv[0]))
-DOWNSCALED_PATH = os.path.join(PROGRAM_DIRECTORY, DOWNSCALED_DIRECTORY)
+
+DOWNSCALED_DIRECTORY = "downscaled"
 
 DOWNSCALED_DPI = 10
-JPEG_QUALITY = 70
+JPEG_QUALITY = 75
 
 root = Tk(className=" Downscaling Images")
-progress_bar = Progressbar(root, orient=HORIZONTAL, length=800, mode='determinate')
+progress_bar = Progressbar(root, orient=HORIZONTAL, length=700, mode='determinate')
 progress_label = Label(root, text="Downscaling")
 error_label = Label(root, text="")
 
@@ -34,11 +35,18 @@ def main():
 def start_downscale():
 	if sys.argv and len(sys.argv) > 1:
 		file_list = sys.argv[1:]
+
+		expanded_list = []
+		for file in file_list:
+			if os.path.isdir(file):
+				expanded_list += get_files(file)
+			else:
+				expanded_list.append(file)
 	else:
 		file_list = get_files()
+		expanded_list = file_list
 
-	root.update_idletasks()
-	downscale_multiple_files(file_list)
+	downscale_multiple_files(expanded_list)
 
 
 def downscale_multiple_files(file_list):
@@ -77,16 +85,16 @@ def handle_completed(completed, count):
 
 
 def downscale_file(file):
-	pwd = os.getcwd()
-
 	filename = os.path.splitext(os.path.basename(file))[0]
-	downscaled_file = os.path.join(DOWNSCALED_PATH, f"{filename}.jpg")
+
+	root_directory = os.path.dirname(file)
+	downscaled_file = os.path.join(root_directory, DOWNSCALED_DIRECTORY, f"{filename}.jpg")
 
 	# if os.path.isfile(downscaled_file):
 	# 	return
 
 	try:
-		im = Image.open(os.path.join(pwd, file))
+		im = Image.open(file)
 
 		if im.mode == "RGBA":
 			im = im.convert("RGB")
@@ -96,7 +104,7 @@ def downscale_file(file):
 
 		im.thumbnail(out_resolution)
 
-		create_downscaled_directory()
+		create_missing_directory(downscaled_file)
 		im.save(downscaled_file, "JPEG", quality=JPEG_QUALITY, dpi=(DOWNSCALED_DPI, DOWNSCALED_DPI))
 	except Exception as e:
 		error_label['text'] = f"({file}) {e}"
@@ -106,23 +114,26 @@ def downscale_file(file):
 	return True
 
 
-def get_files():
-	pwd = os.getcwd()
+def get_files(root_directory=None):
+	if not root_directory:
+		root_directory = PWD
 
-	all_files = [file for file in os.listdir(pwd) if os.path.isfile(os.path.join(pwd, file))]
+	all_files = [file for file in os.listdir(root_directory) if os.path.isfile(os.path.join(root_directory, file))]
 
 	files = []
 	for file in all_files:
-		ext = os.path.splitext(os.path.join(pwd, file))[1].lower()
+		file_path = os.path.join(root_directory, file)
+		ext = os.path.splitext(file_path)[1].lower()
 		if ext in (".tiff", ".tif"):
-			files.append(file)
+			files.append(file_path)
 
 	return files
 
 
-def create_downscaled_directory():
-	if not os.path.exists(DOWNSCALED_PATH):
-		os.makedirs(DOWNSCALED_PATH)
+def create_missing_directory(path):
+	directory = os.path.dirname(path)
+	if not os.path.exists(directory):
+		os.makedirs(directory)
 		return True
 
 
