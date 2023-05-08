@@ -43,3 +43,9 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 [Registry]
 Root: HKCR; Subkey: "SystemFileAssociations\image\shell\Downscale DPI"; Flags: uninsdeletekey; ValueType: string; ValueData: "Downscale DPI"
 Root: HKCR; Subkey: "SystemFileAssociations\image\shell\Downscale DPI\command"; Flags: uninsdeletekey; ValueType: string; ValueData: """C:\\Program Files (x86)\\DPI Downscale\\downscale.exe"" ""%1"""
+
+Root: HKCR; Subkey: "Directory\shell\Downscale DPI"; Flags: uninsdeletekey; ValueType: string; ValueData: "Downscale DPI"
+Root: HKCR; Subkey: "Directory\shell\Downscale DPI\command"; Flags: uninsdeletekey; ValueType: string; ValueData: """C:\\Program Files (x86)\\DPI Downscale\\downscale.exe"" ""%1"""
+
+Root: HKCR; Subkey: "Directory\Background\shell\Downscale DPI"; Flags: uninsdeletekey; ValueType: string; ValueData: "Downscale DPI"
+Root: HKCR; Subkey: "Directory\Background\shell\Downscale DPI\command"; Flags: uninsdeletekey; ValueType: string; ValueData: """C:\\Program Files (x86)\\DPI Downscale\\downscale.exe"" ""%V"""
